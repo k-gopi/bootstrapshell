@@ -24,5 +24,18 @@
 
 4\. Run `terraform apply` to deploy VM
 
+execution commands
 
+cd 01-setup
+./setup.sh
 
+cd 02-secrets
+./get-secrets.sh
+
+cd 03-packer
+./generate-vars.sh
+./build-image.sh
+
+cd 04-sig
+./sig-setup.sh
+./publish-to-sig.sh
