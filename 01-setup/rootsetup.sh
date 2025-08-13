@@ -58,7 +58,6 @@ echo "✅ Service Principal ID: $sp_id"
 
 echo "🔑 Generating new client secret..."
 client_secret=$(az ad app credential reset --id "$app_id" --append --query "password" -o tsv)
-
 if [[ -z "$client_secret" ]]; then
   echo "❌ Failed to generate client secret. Exiting..."
   exit 1
@@ -88,7 +87,18 @@ az role assignment create \
   --role "Contributor" \
   --scope "/subscriptions/$subscription_id" || echo "⚠️ Role may already exist."
 
-echo "⏳ Waiting 120 seconds for role assignments to propagate..."
+echo "⏳ Waiting 90 seconds for role assignments to propagate..."
+sleep 90
+
+# ✅ Assign Key Vault Secrets Officer role to current signed-in user
+current_user_oid=$(az ad signed-in-user show --query id -o tsv)
+echo "🔁 Assigning 'Key Vault Secrets Officer' to current user for Key Vault..."
+az role assignment create \
+  --assignee-object-id "$current_user_oid" \
+  --role "Key Vault Secrets Officer" \
+  --scope "/subscriptions/$subscription_id/resourceGroups/$resource_group/providers/Microsoft.KeyVault/vaults/$key_vault_name" || echo "⚠️ Role may already exist for current user."
+
+echo "⏳ Waiting 120 seconds for new RBAC role to propagate..."
 sleep 120
 
 # 📦 Retrieve Storage Key
@@ -102,13 +112,14 @@ store_secret() {
   az keyvault secret set --vault-name "$key_vault_name" --name "$name" --value "$value" > /dev/null
 }
 
-# 🔐 Store only indbank-dev-* secrets with tenant ID stored as indbank-dev-tenant-id
+# 🔐 Store secrets
 store_secret "${project}-${env}-client-id" "$app_id"
 store_secret "${project}-${env}-client-secret" "$client_secret"
 store_secret "indbank-dev-tenant-id" "$tenant_id"
 store_secret "${project}-${env}-subscription-id" "$subscription_id"
 store_secret "${project}-${env}-storage-account-name" "$storage_account"
 store_secret "${project}-${env}-storage-account-key" "$storage_account_key"
+store_secret "${project}-${env}-storage-container" "$container_name"   # ✅ Added container secret
 
 # 🧑‍💻 Prompt for VM credentials
 read -p "Jump VM Username: " jump_user
