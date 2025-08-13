@@ -3,4 +3,4 @@
 
 # Terraform state files
 *.tfstate
-*.tfstate.*
+*.tfstate.*03-packer/packer.auto.pkrvars.hcl
