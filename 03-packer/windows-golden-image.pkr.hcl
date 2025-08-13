@@ -61,7 +61,14 @@ build {
 
   provisioner "powershell" {
     scripts = [
-      "install-scripts/install-azure-cli.ps1"
+      "install-scripts/install-azure-cli.ps1",
+      "install-scripts/install-dotnet.ps1",
+      "install-scripts/install-docker.ps1",
+      "install-scripts/install-node.ps1",
+      "install-scripts/install-java.ps1",
+      "install-scripts/install-git.ps1",
+      "install-scripts/install-packer.ps1",
+      "install-scripts/install-terraform.ps1"
     ]
   }
 }
