@@ -1,28 +1,10 @@
-packer {
-  required_plugins {
-    azure = {
-      version = ">= 2.0.0"
-      source  = "github.com/hashicorp/azure"
-    }
-  }
-}
+# Variable Declarations
+variable "client_id" {}
+variable "client_secret" {}
+variable "tenant_id" {}
+variable "subscription_id" {}
 
-variable "client_id" {
-  type = string
-}
-
-variable "client_secret" {
-  type = string
-}
-
-variable "tenant_id" {
-  type = string
-}
-
-variable "subscription_id" {
-  type = string
-}
-
+# Azure ARM Source
 source "azure-arm" "win2022" {
   client_id       = var.client_id
   client_secret   = var.client_secret
@@ -35,21 +17,21 @@ source "azure-arm" "win2022" {
 
   os_type         = "Windows"
 
-  # ✅ Use a Hyper-V Gen2 compatible image SKU
   image_publisher = "MicrosoftWindowsServer"
   image_offer     = "WindowsServer"
-  image_sku       = "2022-datacenter-smalldisk-g2"  # 👈 This is Gen2 compatible
+  image_sku       = "2022-datacenter-smalldisk-g2"
 
   communicator    = "winrm"
   winrm_use_ssl   = true
   winrm_insecure  = true
   winrm_username  = "packeradmin"
-  winrm_password  = "SecureP@ssword123!"  # Change this before production
+  winrm_password  = "SecureP@ssword123!"  # ⚠️ Change before prod
   vm_size         = "Standard_B2ms"
 
   temp_resource_group_name = "packer-temp-rg"
 }
 
+# Build Section
 build {
   sources = ["source.azure-arm.win2022"]
 

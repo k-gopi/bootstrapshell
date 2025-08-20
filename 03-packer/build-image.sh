@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "📥 Loading secrets from Azure Key Vault..."
-source ../02-secrets/get-secrets.sh
+source ../02-secrets/userget-secrets.sh
 
 echo "🔐 Generating packer.auto.pkrvars.hcl..."
 source ./generate-vars.sh   # ✅ Use `source` to preserve environment
@@ -33,4 +33,4 @@ packer init .
 echo "🚀 Starting image build with version: ${IMAGE_VERSION}"
 packer build -force \
   -var-file="packer.auto.pkrvars.hcl" \
-  windows-golden-image.pkr.hcl
+  windows2-golden-image.pkr.hcl
